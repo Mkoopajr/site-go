@@ -14,6 +14,11 @@ type TemplateHeader struct {
     context map[string]string
 }
 
+type Template struct {
+    Layout *TemplateHeader
+    View string
+}
+
 func MainTemplate() *TemplateHeader {
     tpl, err := raymond.ParseFile("./views/layouts/main.handlebars")
     if err != nil {
@@ -51,35 +56,16 @@ func MainTemplate() *TemplateHeader {
     return &template
 }
 
-func Home(w http.ResponseWriter, r *http.Request) {
-    header := MainTemplate()
-
-    content, err := ioutil.ReadFile("./views/home.handlebars")
+func (t Template) ServeView(w http.ResponseWriter, r *http.Request) {
+    view := fmt.Sprintf("./views/%v.handlebars", t.View)
+    content, err := ioutil.ReadFile(view)
     if err != nil {
         panic(err)
     }
 
-    header.context["content"] = string(content)
+    t.Layout.context["content"] = string(content)
 
-    result, err := header.template.Exec(header.context)
-    if err != nil {
-        panic(err)
-    }
-
-    fmt.Fprint(w, result)
-}
-
-func About(w http.ResponseWriter, r *http.Request) {
-    header := MainTemplate()
-
-    content, err := ioutil.ReadFile("./views/about.handlebars")
-    if err != nil {
-        panic(err)
-    }
-
-    header.context["content"] = string(content)
-
-    result, err := header.template.Exec(header.context)
+    result, err := t.Layout.template.Exec(t.Layout.context)
     if err != nil {
         panic(err)
     }
@@ -89,22 +75,4 @@ func About(w http.ResponseWriter, r *http.Request) {
 
 func Donate(w http.ResponseWriter, r *http.Request) {
     http.Redirect(w, r, "https://paypal.me/HackSIOrg", 301)
-}
-
-func Sponsors(w http.ResponseWriter, r *http.Request) {
-    header := MainTemplate()
-
-    content, err := ioutil.ReadFile("./views/sponsors.handlebars")
-    if err != nil {
-        panic(err)
-    }
-
-    header.context["content"] = string(content)
-
-    result, err := header.template.Exec(header.context)
-    if err != nil {
-        panic(err)
-    }
-
-    fmt.Fprint(w, result)
 }

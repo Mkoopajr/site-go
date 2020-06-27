@@ -8,12 +8,15 @@ import (
 )
 
 func main() {
+    mainView := routes.MainTemplate()
+
     r := mux.NewRouter()
     r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
-    r.HandleFunc("/", routes.Home)
-    r.HandleFunc("/about", routes.About)
+    r.HandleFunc("/", routes.Template{mainView, "home"}.ServeView)
+    r.HandleFunc("/about", routes.Template{mainView, "about"}.ServeView)
     r.HandleFunc("/donate", routes.Donate)
-    r.HandleFunc("/sponsors", routes.Sponsors)
+    r.HandleFunc("/sponsors", routes.Template{mainView, "sponsors"}.ServeView)
+    r.HandleFunc("/contact", routes.Template{mainView, "contact"}.ServeView)
 
     http.Handle("/", r)
 
