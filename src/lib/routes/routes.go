@@ -5,13 +5,15 @@ import (
     "io/ioutil"
     "net/http"
     "strings"
+    "time"
+    "lib/press"
 
     "github.com/aymerick/raymond"
 )
 
 type TemplateHeader struct {
     template *raymond.Template
-    context map[string]string
+    context map[string]interface{}
 }
 
 type Template struct {
@@ -48,7 +50,7 @@ func MainTemplate() *TemplateHeader {
         }
     }
 
-    ctx := map[string]string{
+    ctx := map[string]interface{}{
         "banners": banTpl.String(),
     }
 
@@ -58,12 +60,28 @@ func MainTemplate() *TemplateHeader {
 
 func (t Template) ServeView(w http.ResponseWriter, r *http.Request) {
     view := fmt.Sprintf("./views/%v.handlebars", t.View)
-    content, err := ioutil.ReadFile(view)
+    content, err := raymond.ParseFile(view)
     if err != nil {
         panic(err)
     }
 
-    t.Layout.context["content"] = string(content)
+    var contentString string
+    if t.View == "press" {
+        var press *press.Press
+        press = press.GetPress()
+        contentString, err = content.Exec(map[string]interface{}{
+            "press": press.Data,
+        })
+        if err != nil {
+            panic(err)
+        }
+    } else {
+        contentString, err = content.Exec(map[string]string{})
+    }
+
+    t.Layout.context["content"] = contentString
+    t.Layout.context["title"] = t.View
+    t.Layout.context["currentYear"] = fmt.Sprintf("%v", time.Now().Year())
 
     result, err := t.Layout.template.Exec(t.Layout.context)
     if err != nil {

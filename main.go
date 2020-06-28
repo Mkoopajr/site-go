@@ -17,6 +17,7 @@ func main() {
     r.HandleFunc("/donate", routes.Donate)
     r.HandleFunc("/sponsors", routes.Template{mainView, "sponsors"}.ServeView)
     r.HandleFunc("/contact", routes.Template{mainView, "contact"}.ServeView)
+    r.HandleFunc("/press", routes.Template{mainView, "press"}.ServeView)
 
     http.Handle("/", r)
 
