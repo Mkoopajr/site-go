@@ -21,6 +21,10 @@ type Template struct {
     View string
 }
 
+type Url struct {
+    Destination string
+}
+
 func MainTemplate() *TemplateHeader {
     tpl, err := raymond.ParseFile("./views/layouts/main.handlebars")
     if err != nil {
@@ -91,6 +95,6 @@ func (t Template) ServeView(w http.ResponseWriter, r *http.Request) {
     fmt.Fprint(w, result)
 }
 
-func Donate(w http.ResponseWriter, r *http.Request) {
-    http.Redirect(w, r, "https://paypal.me/HackSIOrg", 301)
+func (url Url) Redirect(w http.ResponseWriter, r *http.Request) {
+    http.Redirect(w, r, url.Destination, 301)
 }
