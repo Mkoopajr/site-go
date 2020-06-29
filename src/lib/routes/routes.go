@@ -48,9 +48,9 @@ func MainTemplate() *TemplateHeader {
     var banTpl strings.Builder
     for i, file := range banImgs {
         if i == 0 {
-            fmt.Fprintf(&banTpl, "<img src='./static/img/banner/%v' class='banner-img show'>", file.Name())
+            fmt.Fprintf(&banTpl, "<img src='/static/img/banner/%v' class='banner-img show'>", file.Name())
         } else {
-            fmt.Fprintf(&banTpl, "<img src='./static/img/banner/%v' class='banner-img'>", file.Name())
+            fmt.Fprintf(&banTpl, "<img src='/static/img/banner/%v' class='banner-img'>", file.Name())
         }
     }
 
